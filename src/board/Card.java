@@ -47,7 +47,7 @@ public class Card implements Serializable
 		this.suit = suit;
 	}
 	/**
-	 * To get the image string eith unicode for this specific card
+	 * To get the image string With unicode for this specific card
 	 * @return the string of the file name
 	 */
 	public String getImageString()
@@ -55,15 +55,15 @@ public class Card implements Serializable
 		String imageString = ""; //"K"+Character.toString((char)0x2660); king of spades
 		
 		if(value < 11 && value > 1)
-			imageString+= value+" ";
+			imageString+= value;
 		else if(value == 1)
-			imageString+="A ";
+			imageString+="A";
 		else if(value == 11)
-			imageString+="J ";
+			imageString+="J";
 		else if(value == 12)
-			imageString+="Q ";
+			imageString+="Q";
 		else if(value == 13)
-			imageString+="K ";
+			imageString+="K";
 		if(suit == 0)
 			imageString+=Character.toString((char)0x2660);
 		else if(suit == 1)

@@ -83,9 +83,9 @@ public class Player implements Serializable
 	 * gets the arraylist of cards the player has to visualize
 	 * @return
 	 */
-	public ArrayList<Card> showHand()
+	public ArrayList<String> showHand()
 	{
-		return this.currHand.getCards();
+		return this.currHand.showCards();
 	}
 	/**
 	 * gets the amount of total money a player has to visualize

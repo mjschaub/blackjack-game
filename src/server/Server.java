@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import players.Player;
 
 import board.Board;
+import board.Card;
 
 /**
  * the Server class that handles all of the networking for the server of the blackjack game
@@ -23,6 +24,9 @@ public class Server implements Runnable
 
 	public Board gameBoard;
 	private ArrayList<String> playerPings = new ArrayList<String>();
+	private ArrayList<Player> numPlayersReady = new ArrayList<Player>();
+	private int idxTurn;
+	
 	
 	private int port;
 	private DatagramSocket socket;
@@ -56,7 +60,7 @@ public class Server implements Runnable
 		setupClients();
 		receivePackets();
 	}
-	/*
+	/**
 	 * sets up the information about the clients, eventually going to deal with logging them in and out
 	 */
 	private void setupClients()
@@ -142,33 +146,7 @@ public class Server implements Runnable
 		};
 		sendThread.start();
 	}
-	/*private void sendPackets(Object obj, final InetAddress address, final int port)
-	{
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
-		ObjectOutputStream oos;
-		try {
-			oos = new ObjectOutputStream(baos);
-			oos.writeObject(obj);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-		
-		final byte[] data = baos.toByteArray();
-		
-		sendThread = new Thread("sending data")
-		{
-			public void run()
-			{
-				DatagramPacket packet = new DatagramPacket(data,data.length,address,port);
-				try {
-					socket.send(packet);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		sendThread.start();
-	}*/
+
 	
 	private void parseActions(String msg,DatagramPacket packet)
 	{
@@ -182,8 +160,11 @@ public class Server implements Runnable
 			//sendPackets(gameBoard,packet.getAddress(),packet.getPort());
 			String idOfPlayerAdded = "Connected,"+(gameBoard.getNumPlayers()-1)+","+startingMoney+","+currBet+",";
 			sendPackets(idOfPlayerAdded.getBytes(),packet.getAddress(),packet.getPort());
-			String setupPlayerForGame = "PlaceAtTable,"+(gameBoard.getNumPlayers()-1)+","+name+",";
-			sendActionsToEveryone(setupPlayerForGame);
+			for(int i =0;i < gameBoard.getNumPlayers(); i++)
+			{
+				String setupPlayerForGame = "PlaceAtTable,"+i+","+gameBoard.getPlayerByID(i).getName()+",";
+				sendActionsToEveryone(setupPlayerForGame);
+			}
 			
 		}
 		else if(msg.startsWith("Disconnect"))
@@ -191,8 +172,11 @@ public class Server implements Runnable
 			String[] arguments = msg.split(",");
 			int idOfPlayerLeaving = Integer.parseInt(arguments[1]);
 			gameBoard.playerHasLeft(idOfPlayerLeaving);
+			if(numPlayersReady.contains(gameBoard.getPlayerByID(idOfPlayerLeaving)))
+				numPlayersReady.remove(gameBoard.getPlayerByID(idOfPlayerLeaving));
 			String actionForClients = "Disconnected,"+idOfPlayerLeaving+",";
 			sendActionsToEveryone(actionForClients);
+			
 			
 		}
 		else if(msg.startsWith("Ping"))
@@ -200,35 +184,153 @@ public class Server implements Runnable
 			playerPings.add(msg.split(",")[1]);
 			System.out.println("added ping to playerPings for: "+playerPings.get(0));
 		}
-		else if(msg.startsWith("StartGame"))
+		else if(msg.startsWith("ReadyToPlay"))
 		{
-			
-		}
-		else if(msg.startsWith("Forfeit"))
-		{
-			
+			this.numPlayersReady.add(gameBoard.getPlayerByID(Integer.parseInt(msg.split(",")[1])));
+			if(numPlayersReady.size() == gameBoard.getNumPlayers())
+			{
+				int typeOfGame = 0; //to be implemented week 4
+				gameBoard.shuffle();
+				gameBoard.dealDealerCard();
+				gameBoard.dealDealerCard();
+				gameBoard.turn = numPlayersReady.get(0).getPlayerNum();
+				idxTurn = 0;
+				String startGame = "StartGame,"+typeOfGame+","+gameBoard.turn+","+gameBoard.dealer.cardsToShow().get(0).getImageString()+",";
+				for(int i = 0; i < numPlayersReady.size(); i++)
+				{
+					gameBoard.dealPlayerCard(numPlayersReady.get(i).getPlayerNum());
+					gameBoard.dealPlayerCard(numPlayersReady.get(i).getPlayerNum());
+					startGame += numPlayersReady.get(i).getPlayerNum()+","+numPlayersReady.get(i).showHand().get(0)+","+numPlayersReady.get(i).showHand().get(1)+",";
+					
+				}
+				sendActionsToEveryone(startGame);
+				for(int i = 0; i < numPlayersReady.size(); i++)
+				{
+					Player currPlayer = gameBoard.getPlayerByID(numPlayersReady.get(i).getPlayerNum());
+					if(gameBoard.dealer.getBlackJackScore() == 21)
+					{	
+						if(currPlayer.getBlackjackScore() == 21)
+						{
+							gameBoard.setPlayerWonOrLoss(currPlayer, 2);
+							String gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"2"+","+currPlayer.getMoney()+",";
+							this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
+						}
+						else
+						{
+							gameBoard.setPlayerWonOrLoss(currPlayer, 0);
+							String gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+",";
+							this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
+						}
+					}
+					if(currPlayer.getBlackjackScore() == 21)
+					{
+						gameBoard.setPlayerWonOrLoss(currPlayer, 1);
+						String gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"1"+","+currPlayer.getMoney()+",";
+						this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
+					}
+				}
+			}
+				
 		}
 		else if(msg.startsWith("Hit"))
 		{
-			
+			int Id = Integer.parseInt(msg.split(",")[1]);
+			gameBoard.dealPlayerCard(Id);
+			Player currPlayer = gameBoard.getPlayerByID(Id);
+			if(currPlayer.getBlackjackScore() > 21)
+			{
+				gameBoard.setPlayerWonOrLoss(currPlayer, 0);
+				String gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+",";
+				this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
+			}
+			String addCards = "Hit,"+Id+",";
+			ArrayList<String> cards = gameBoard.getPlayerByID(Id).showHand();
+			for(int i =0; i < cards.size(); i++)
+			{
+				addCards+=cards.get(i)+",";
+			}
+			sendActionsToEveryone(addCards);
 		}
 		else if(msg.startsWith("Stand"))
 		{
+			int Id = Integer.parseInt(msg.split(",")[1]);
 			
-		}
-		else if(msg.startsWith("Deal"))
-		{
-			
-		}
-		else if(msg.startsWith("Bet"))
-		{
+			idxTurn++;
+			if(idxTurn >= numPlayersReady.size())
+			{
+				//dealer goes
+				boolean dealerWentOver = false;
+				while(gameBoard.dealer.getBlackJackScore() <= 16)
+				{
+					gameBoard.dealDealerCard();
+				}
+				gameBoard.dealer.nextTurn();
+				ArrayList<Card> dealerCards = gameBoard.dealer.cardsToShow();
+				String showDealerCards = "Dealer,";
+				for(int i =0;i < dealerCards.size(); i++)
+				{
+					showDealerCards+=dealerCards.get(i).getImageString()+",";
+				}
+				sendActionsToEveryone(showDealerCards);
+				if(gameBoard.dealer.getBlackJackScore() > 21)
+				{
+					for(int i = 0; i < this.numPlayersReady.size(); i++)
+					{
+						gameBoard.setPlayerWonOrLoss(numPlayersReady.get(i),1);
+						String gameEnd = "EndGame,"+numPlayersReady.get(i).getPlayerNum()+","+"1"+","+numPlayersReady.get(i).getMoney()+",";
+						sendPackets(gameEnd.getBytes(), numPlayersReady.get(i).address, numPlayersReady.get(i).port);
+					}
+					dealerWentOver=true;
+				}
+				if(!dealerWentOver)
+				{
+					for(int i = 0; i < numPlayersReady.size();i++)
+					{
+						Player currPlayer = numPlayersReady.get(i);
+						if(currPlayer.getBlackjackScore() > gameBoard.dealer.getBlackJackScore())
+						{
+							gameBoard.setPlayerWonOrLoss(currPlayer, 1);
+							String gameEnd = "EndGame,"+numPlayersReady.get(i).getPlayerNum()+","+"1"+","+currPlayer.getMoney()+",";
+							sendPackets(gameEnd.getBytes(), numPlayersReady.get(i).address, numPlayersReady.get(i).port);
+						}
+						else if(currPlayer.getBlackjackScore() < gameBoard.dealer.getBlackJackScore())
+						{
+							gameBoard.setPlayerWonOrLoss(currPlayer, 0);
+							String gameEnd = "EndGame,"+numPlayersReady.get(i).getPlayerNum()+","+"0"+","+currPlayer.getMoney()+",";
+							sendPackets(gameEnd.getBytes(), numPlayersReady.get(i).address, numPlayersReady.get(i).port);
+						}
+						else
+						{
+							gameBoard.setPlayerWonOrLoss(currPlayer, 2);
+							String gameEnd = "EndGame,"+numPlayersReady.get(i).getPlayerNum()+","+"2"+","+currPlayer.getMoney()+",";
+							sendPackets(gameEnd.getBytes(), numPlayersReady.get(i).address, numPlayersReady.get(i).port);
+						}
+					}
+				}
+			}
+			else
+			{
+				int newPlayersTurn = numPlayersReady.get(idxTurn).getPlayerNum();
+				String clientAction = "Stand,"+newPlayersTurn+",";
+				sendActionsToEveryone(clientAction);
+			}
 			
 		}
 		else if(msg.startsWith("PlayAgain"))
 		{
-			
+			String[] arguments = msg.split(",");
+			int Id = Integer.parseInt(arguments[1]);
+			double newBet = Double.parseDouble(arguments[2]);
+			gameBoard.getPlayerByID(Id).setCurrBet(newBet);
+			//go through the players and clear their cards
+			//clear the dealers cards
+			//call the start game
 		}
-
+		else if(msg.startsWith("Forfeit"))
+		{
+			//give half of the bet back and go to the next player
+		}
+		
 	}
 	private void sendActionsToEveryone(String msg)
 	{

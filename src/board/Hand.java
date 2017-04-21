@@ -116,5 +116,14 @@ public class Hand implements Serializable
 	{
 		return this.hand;
 	}
+	public ArrayList<String> showCards()
+	{
+		ArrayList<String> cardTxt = new ArrayList<String>();
+		for(int i = 0; i < hand.size(); i++)
+		{
+			cardTxt.add(hand.get(i).getImageString());
+		}
+		return cardTxt;
+	}
 	
 }

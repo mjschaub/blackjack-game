@@ -17,14 +17,14 @@ import players.Player;
 public class Board implements Serializable
 {
 	
-	private Dealer dealer;
-	private ArrayList<Player> players;
+	public Dealer dealer;
+	public ArrayList<Player> players;
 	private Deck gameDeck;
-	private int turn; // -1 for dealer, player id from 0 - numPlayers
+	public int turn; // -1 for dealer, player id from 0 - numPlayers
 	private int numPlayers;
 	private boolean isRunning;
 	/**
-	 * the board constructor to initialize the player arraylist and the dealer
+	 * the board constructor to initialize the player ArrayList and the dealer
 	 */
 	public Board()
 	{
@@ -231,10 +231,14 @@ public class Board implements Serializable
 	 * @param curr the current player
 	 * @param won the integer value of winning/losing/a tie
 	 */
-	private void setPlayerWonOrLoss(Player curr, int won)
+	public void setPlayerWonOrLoss(Player curr, int won)
 	{
 		curr.setWon(won);
 		curr.prepForNewGame();
+	}
+	public void shuffle()
+	{
+		gameDeck.shuffle();
 	}
 	
 
