@@ -23,11 +23,13 @@ import players.Player;
  */
 public class Client 
 {
-	//public Player clientPlayer;
+
 	private DatagramSocket socket;
 	private InetAddress ip;
 	private Thread sendingThread;
-	
+	/**
+	 * default constructor for the client
+	 */
 	public Client()
 	{
 		
@@ -64,18 +66,6 @@ public class Client
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		/*ByteArrayInputStream byteStream = new ByteArrayInputStream(data);
-		ObjectInputStream is;
-		Object obj = null;
-		try {
-			is = new ObjectInputStream(new BufferedInputStream(byteStream));
-
-			while(is.available() > 0)
-				obj = is.readObject();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
 		
 		String action = new String(packet.getData());
 		return action;
@@ -101,11 +91,9 @@ public class Client
 		};
 		sendingThread.start();
 	}
-	/*public void setPlayer(Player client)
-	{
-		this.clientPlayer = client;
-		System.out.println("set player: "+client+" to client");
-	}*/
+	/**
+	 * closes a client connection when they disconnect
+	 */
 	public void closeConnection()
 	{
 		new Thread()

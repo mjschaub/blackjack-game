@@ -13,7 +13,7 @@ import board.Hand;
  * @author mjschaub
  * the Dealer class
  */
-public class Dealer implements Serializable
+public class Dealer
 {
 
 	private Hand dealerHand;
@@ -75,5 +75,9 @@ public class Dealer implements Serializable
 	public void nextTurn()
 	{
 		this.turn++;
+	}
+	public void clearHand()
+	{
+		this.dealerHand.emptyHand();
 	}
 }

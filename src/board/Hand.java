@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * @author mjschaub
  * the hand class containing the cards in each hand and the blackjack value they represent
  */
-public class Hand implements Serializable
+public class Hand
 {
 
 	private ArrayList<Card> hand;
@@ -116,6 +116,10 @@ public class Hand implements Serializable
 	{
 		return this.hand;
 	}
+	/**
+	 * the cards to show in the hand and gets the image string
+	 * @return the arraylist of unicode strings for the cards
+	 */
 	public ArrayList<String> showCards()
 	{
 		ArrayList<String> cardTxt = new ArrayList<String>();
@@ -124,6 +128,13 @@ public class Hand implements Serializable
 			cardTxt.add(hand.get(i).getImageString());
 		}
 		return cardTxt;
+	}
+	
+	public boolean isAbleToSplit()
+	{
+		if(hand.get(0).getSplitValue() == hand.get(1).getSplitValue())
+			return true;
+		return false;
 	}
 	
 }

@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author mjschaub
  * the deck class with logic to shuffle all the cards
  */
-public class Deck implements Serializable
+public class Deck
 {
 
     private Card[] deck;   

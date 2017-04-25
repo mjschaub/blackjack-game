@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author mjschaub
  * the card class that has the logic for all 52 cards in a deck
  */
-public class Card implements Serializable
+public class Card
 {
 
 	private final int suit;
@@ -52,18 +52,18 @@ public class Card implements Serializable
 	 */
 	public String getImageString()
 	{
-		String imageString = ""; //"K"+Character.toString((char)0x2660); king of spades
+		String imageString = "<html>"; //"K"+Character.toString((char)0x2660); king of spades
 		
 		if(value < 11 && value > 1)
-			imageString+= value;
+			imageString+= value+"<br>";
 		else if(value == 1)
-			imageString+="A";
+			imageString+="A<br>";
 		else if(value == 11)
-			imageString+="J";
+			imageString+="J<br>";
 		else if(value == 12)
-			imageString+="Q";
+			imageString+="Q<br>";
 		else if(value == 13)
-			imageString+="K";
+			imageString+="K<br>";
 		if(suit == 0)
 			imageString+=Character.toString((char)0x2660);
 		else if(suit == 1)
@@ -72,6 +72,7 @@ public class Card implements Serializable
 			imageString+=Character.toString((char)0x2662);
 		else
 			imageString+=Character.toString((char)0x2663);
+		imageString+="</html>";
 		return imageString;
 	}
 	/**
@@ -89,6 +90,18 @@ public class Card implements Serializable
 	public int getValue() 
 	{
 		return value;
+	}
+	
+	public int getSplitValue()
+	{
+		if(value < 11)
+			return value;
+		else if(value == 11)
+			return 10;
+		else if(value == 12)
+			return 10;
+		else
+			return 10;
 	}
 	
 }

@@ -11,7 +11,7 @@ import board.Hand;
  * @author mjschaub
  * the Player class
  */
-public class Player implements Serializable
+public class Player
 {
 
 	private int playerNum;
@@ -111,14 +111,7 @@ public class Player implements Serializable
 	{
 		return this.currHand.getBlackjacktotalValue();
 	}
-	/**
-	 * is called when a player stands in the game
-	 */
-	public void stand()
-	{
-		//gameloop - dealer makes move or change turns to other player
-		
-	}
+
 	/**
 	 * is called when a player hits or requests another card to be dealt to their hand
 	 * @param newCard the new card to add
@@ -134,8 +127,6 @@ public class Player implements Serializable
 	{
 		currHand.emptyHand();
 		this.changeMoneyAmount();
-		
-		//request new bet on GUI
 	}
 	/**
 	 * sets whether this player has won/lost/tied the current game
@@ -144,6 +135,12 @@ public class Player implements Serializable
 	public void setWon(int num)
 	{
 		this.hasWon = num;
+	}
+	public int canPlayerSplit()
+	{
+		if(this.currHand.isAbleToSplit())
+			return 1;
+		return 0;
 	}
 
 	

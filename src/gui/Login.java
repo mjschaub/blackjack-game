@@ -121,8 +121,11 @@ public class Login extends JFrame
 	 */
 	private void addClient(String name, double money, double bet)
 	{
-		dispose();
-		System.out.println(name+" with $"+money+" would like to join the game betting "+bet);
-		new GameClient(name,money,bet);
+		if(money > 0 && bet > 0 && money > bet && !name.equals(""))
+		{
+			dispose();
+			System.out.println(name+" with $"+money+" would like to join the game betting "+bet);
+			new GameClient(name,money,bet);
+		}
 	}
 }

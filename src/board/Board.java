@@ -14,7 +14,7 @@ import players.Player;
  * @author mjschaub
  * the class for board logic and the game loop
  */
-public class Board implements Serializable
+public class Board
 {
 	
 	public Dealer dealer;
@@ -109,31 +109,6 @@ public class Board implements Serializable
 			
 			
 		} while(isRunning);
-		/*Create and shuffle a deck of cards
-         Create two BlackjackHands, userHand and dealerHand
-         Deal two cards into each hand
-         if dealer has blackjack
-             User loses and the game ends now
-         If user has blackjack
-             User wins and the game ends now
-         Repeat:
-             Ask whether user wants to hit or stand
-             if user stands:
-                 break out of loop
-             if user hits:
-                 Give user a card
-                 if userHand.getBlackjackValue() > 21:
-                     User loses and the game ends now
-         while  dealerHand.getBlackJackValue() <= 16 :
-             Give dealer a card
-             if dealerHand.getBlackjackValue() > 21:
-                 User wins and game ends now
-         if dealerHand.getBlackjackValue() >= userHand.getBlackjackValue()
-             User loses
-         else
-             User wins
-             */
-		
 		
 	}
 	/**
@@ -236,6 +211,9 @@ public class Board implements Serializable
 		curr.setWon(won);
 		curr.prepForNewGame();
 	}
+	/**
+	 * shuffles the game board's deck
+	 */
 	public void shuffle()
 	{
 		gameDeck.shuffle();
