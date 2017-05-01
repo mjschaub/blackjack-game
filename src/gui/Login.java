@@ -104,6 +104,7 @@ public class Login extends JFrame
 		});
 		btnEnter.setBounds(216, 340, 117, 25);
 		contentPane.add(btnEnter);
+		getRootPane().setDefaultButton(btnEnter);
 		
 		JLabel lblTop = new JLabel("You are about to enter the game, please enter these details");
 		lblTop.setBounds(54, 73, 442, 15);

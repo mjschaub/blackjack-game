@@ -85,13 +85,16 @@ public class Card
 	}
 	/**
 	 * gets the type of card it is
-	 * @return the integer represenation of the face of the card
+	 * @return the integer representation of the face of the card
 	 */
 	public int getValue() 
 	{
 		return value;
 	}
-	
+	/**
+	 * gets the split value of the card
+	 * @return the integer number value
+	 */
 	public int getSplitValue()
 	{
 		if(value < 11)

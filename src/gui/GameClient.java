@@ -139,8 +139,37 @@ public class GameClient extends JFrame implements Runnable
 	private JLabel lblPlayer1rightsplitthree;
 	private JLabel lblPlayer1rightsplitfour;
 	private JLabel lblPlayer1rightsplitfive;
-
-	 
+	private JLabel lblPlayer2rightsplitfive;
+	private JLabel lblPlayer2rightsplitfour;
+	private JLabel lblPlayer2leftsplitone;
+	private JLabel lblPlayer2leftsplittwo;
+	private JLabel lblPlayer2leftsplitthree;
+	private JLabel lblPlayer2leftsplitfour;
+	private JLabel lblPlayer2leftsplitfive;
+	private JLabel lblPlayer2rightsplitone;
+	private JLabel lblPlayer2rightsplittwo;
+	private JLabel lblPlayer2rightsplitthree;
+	private JLabel lblPlayer3rightsplitfive;
+	private JLabel lblPlayer3rightsplitfour;
+	private JLabel lblPlayer3leftsplitone;
+	private JLabel lblPlayer3leftsplittwo;
+	private JLabel lblPlayer3leftsplitthree;
+	private JLabel lblPlayer3leftsplitfour;
+	private JLabel lblPlayer3leftsplitfive;
+	private JLabel lblPlayer3rightsplitone;
+	private JLabel lblPlayer3rightsplittwo;
+	private JLabel lblPlayer3rightsplitthree;
+	private JLabel lblPlayer4rightsplitfive;
+	private JLabel lblPlayer4rightsplitfour;
+	private JLabel lblPlayer4leftsplitone;
+	private JLabel lblPlayer4leftsplittwo;
+	private JLabel lblPlayer4leftsplitthree;
+	private JLabel lblPlayer4leftsplitfour;
+	private JLabel lblPlayer4leftsplitfive;
+	private JLabel lblPlayer4rightsplitone;
+	private JLabel lblPlayer4rightsplittwo;
+	private JLabel lblPlayer4rightsplitthree;
+	
 	
 	
 	/**
@@ -208,9 +237,10 @@ public class GameClient extends JFrame implements Runnable
 	 */
 	private void parseActions(String msg)
 	{
+		String[] arguments = msg.split(",");
+		
 		if(msg.startsWith("Connected"))
 		{
-			String[] arguments = msg.split(",");
 			playerID = Integer.parseInt(arguments[1]);
 			String money = arguments[2];
 			String bet = arguments[3];
@@ -224,7 +254,6 @@ public class GameClient extends JFrame implements Runnable
 		}
 		else if(msg.startsWith("PlaceAtTable"))
 		{
-			String[] arguments = msg.split(",");
 			int Id = Integer.parseInt(arguments[1]);
 			String name = arguments[2];
 			String label = "lblPlayer"+Id;
@@ -232,275 +261,463 @@ public class GameClient extends JFrame implements Runnable
 			
 		}
 		else if(msg.startsWith("Disconnected"))
-		{
-			String[] arguments = msg.split(",");
-			int Id = Integer.parseInt(arguments[1]);
-			String label = "lblPlayer"+Id;
-			labels.get(label).setText("");
-			labels.get("lblPlayer"+Id+"cardone").setVisible(false);
-			labels.get("lblPlayer"+Id+"cardtwo").setVisible(false);
-			labels.get("lblPlayer"+Id+"cardthree").setVisible(false);
-			labels.get("lblPlayer"+Id+"cardfour").setVisible(false);
-			labels.get("lblPlayer"+Id+"cardfive").setVisible(false);
-			labels.get("lblPlayer"+Id+"cardsix").setVisible(false);
-		}
+			handleDisconnect(arguments);
 		else if(msg.startsWith("StartGame"))
-		{
-			this.btnReadyToPlay.setVisible(false);
-			String[] arguments = msg.split(",");
-			int canDoubleDown = Integer.parseInt(arguments[1]);
-			int currTurn = Integer.parseInt(arguments[2]);
-			int canSplit = Integer.parseInt(arguments[4]);
-			if(playerID == currTurn)
-			{
-				lblGamestate.setText("It's currently your turn!");
-				btnHit.setVisible(true);
-				btnStand.setVisible(true);
-				if(canDoubleDown == 1)
-					btnDoubleDown.setVisible(true);
-				if(canSplit == 1)
-					this.btnSplit.setVisible(true);
-			}
-			else
-				lblGamestate.setText("It's currently someone else's turn!");
-			String dealerCard = arguments[3];
-			lblDealercardone.setText(dealerCard);
-			lblDealercardone.setVisible(true);
-			lblDealercardtwo.setVisible(true);
-			for(int i = 5; i < arguments.length-1; i+=3)
-			{
-				int playerToGiveCards = Integer.parseInt(arguments[i]);
-				String cardone = arguments[i+1];
-				String cardtwo = arguments[i+2];
-				String labelIdentifier = "lblPlayer"+playerToGiveCards+"cardone";
-				String labelIdentifier2 = "lblPlayer"+playerToGiveCards+"cardtwo";
-				labels.get(labelIdentifier).setText(cardone);
-				labels.get(labelIdentifier2).setText(cardtwo);
-				labels.get(labelIdentifier).setVisible(true);
-				labels.get(labelIdentifier2).setVisible(true);
-			}
-				
-		}
+			startUpGame(arguments);
 		else if(msg.startsWith("EndGame"))
-		{
-			String[] arguments = msg.split(",");
-			double newMoney = Double.parseDouble(arguments[3]);
-			lblMoney.setText("Money: $"+newMoney);
-			int won = Integer.parseInt(arguments[2]);
-			int choice =1;
-			if(won == 0)
-			{
-        		Object[] options = {"Play Again","Stop playing"};
-        		choice = JOptionPane.showOptionDialog(this,
-        					"You have lost this round!",
-        					"Would you like to play again?",
-        					JOptionPane.YES_NO_OPTION,
-        					JOptionPane.QUESTION_MESSAGE,
-        					null,
-        					options,
-        					options[1]);
-        		
-			}
-			else if(won == 1)
-			{
-				
-				Object[] options = {"Play Again","Stop playing"};
-        		choice = JOptionPane.showOptionDialog(this,
-        					"You have won this round!",
-        					"Would you like to play again?",
-        					JOptionPane.YES_NO_OPTION,
-        					JOptionPane.QUESTION_MESSAGE,
-        					null,
-        					options,
-        					options[1]);
-			}
-			else if(won == 2)
-			{
-				
-				Object[] options = {"Play Again","Stop playing"};
-        		choice = JOptionPane.showOptionDialog(this,
-        					"You have tied this round!",
-        					"Would you like to play again?",
-        					JOptionPane.YES_NO_OPTION,
-        					JOptionPane.QUESTION_MESSAGE,
-        					null,
-        					options,
-        					options[1]);
-        	
-			}
-			else if(won == 3)
-			{
-				
-				Object[] options = {"Play Again","Stop playing"};
-        		choice = JOptionPane.showOptionDialog(this,
-        					"You have forfeitted this round!",
-        					"Would you like to play again?",
-        					JOptionPane.YES_NO_OPTION,
-        					JOptionPane.QUESTION_MESSAGE,
-        					null,
-        					options,
-        					options[1]);
-        	
-			}
-			if(choice == 0)
-    		{
-    			double newBet = Double.parseDouble(JOptionPane.showInputDialog(this, "Insert next bet: ", "(eg. 500)"));
-    			lblBet.setText("Current Bet: $"+newBet);
-    			String playAgain = "PlayAgain,"+playerID+","+newBet+",";
-    			sendAction(playAgain);	//play another game
-    		}
-    		else
-    			this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); // quit
-    		
-		}
+			handleEndGame(arguments);
 		else if(msg.startsWith("Split"))
-		{
-			//splitting logic
-		}
-		else if(msg.startsWith("SplitHit"))
-		{
-			//splitting logic
-		}
-		else if(msg.startsWith("SplitStand"))
-		{
-			//splitting logic
-		}
-		else if(msg.startsWith("SplitDoubleDown"))
-		{
-			//splitting logic
-		}
+			handleSplit(arguments);	
 		else if(msg.startsWith("Hit"))
-		{
-			String[] arguments = msg.split(",");
-			int Id = Integer.parseInt(arguments[1]);
-			btnDoubleDown.setVisible(false);
-			btnSplit.setVisible(false);
-			for(int i = 2;i < arguments.length-1; i++)
-			{
-				String labelIdentifier = "lblPlayer"+Id;
-				if(i == 2)
-					labelIdentifier+="cardone";
-				else if(i == 3)
-					labelIdentifier+="cardtwo";
-				else if(i == 4)
-					labelIdentifier+="cardthree";
-				else if(i == 5)
-					labelIdentifier+="cardfour";
-				else if(i == 6)
-					labelIdentifier+="cardfive";
-				else if(i == 7)
-					labelIdentifier+="cardsix";
-				labels.get(labelIdentifier).setText(arguments[i]);
-				labels.get(labelIdentifier).setVisible(true);
-			}
-			
-		}
+			handleHit(arguments);
 		else if(msg.startsWith("Stand"))
-		{
-			String[] arguments = msg.split(",");
-			if(playerID == Integer.parseInt(arguments[1]))
-			{
-				lblGamestate.setText("It's currently your turn!");
-				btnHit.setVisible(true);
-				btnStand.setVisible(true);
-				if(Integer.parseInt(arguments[2]) == 1)
-					btnDoubleDown.setVisible(true);
-				if(Integer.parseInt(arguments[3]) == 1)
-					btnSplit.setVisible(true);
-				
-			}
-			else
-			{
-				btnHit.setVisible(false);
-				btnStand.setVisible(false);
-				btnDoubleDown.setVisible(false);
-				btnSplit.setVisible(false);
-				lblGamestate.setText("You have finished your turn, wait for others to catch up!");
-			}
-			
-		}
+			handleStand(arguments);
 		else if(msg.startsWith("RemoveReadyUp"))
-		{
 			this.btnReadyToPlay.setVisible(false);
-		}
 		else if(msg.startsWith("ShowReadyUp"))
 		{
 			lblGamestate.setText("Ready up to play a game!");
 			this.btnReadyToPlay.setVisible(true);
 		}
 		else if(msg.startsWith("Dealer"))
+			dealerTurn(arguments);
+		else if(msg.startsWith("GameState"))
+			this.lblGamestate.setText(msg.split(",")[1]);
+		else if(msg.startsWith("PlayAgain"))
+			handleReplaying(arguments);
+	}
+	/**
+	 * deals with the GUI logic of replaying, getting new bets and starting a new deal
+	 * @param arguments 
+	 */
+	private void handleReplaying(String[] arguments) 
+	{
+		double bet = Double.parseDouble(arguments[1]);
+		lblBet.setText("Current Bet: $"+bet);
+		this.btnReadyToPlay.setVisible(true);
+		btnHit.setVisible(false);
+		btnStand.setVisible(false);
+		btnDoubleDown.setVisible(false);
+		btnSplit.setVisible(false);
+		this.lblGamestate.setText("Waiting for other players to finish game and ready up");
+		for(int i = 0; i < 6; i++)
 		{
-			lblDealercardtwo.setVisible(false);
-			btnHit.setVisible(false);
-			btnStand.setVisible(false);
-			btnDoubleDown.setVisible(false);
-			String[] arguments = msg.split(",");
-			for(int i = 1;i < arguments.length-1; i++)
+			for(int j = 1;j <18; j++)
 			{
-				String labelIdentifier = "lblDealer";
-				if(i == 1)
+				String labelIdentifier = "";
+				if(i != 5)
+					labelIdentifier = "lblPlayer"+i;
+				else if(j < 7 || j > 16)
+					labelIdentifier = "lblDealer";
+				else
+					continue;
+				if(j == 1)
 					labelIdentifier+="cardone";
-				else if(i == 2)
-					labelIdentifier+="cardtwoseen";
-				else if(i == 3)
+				else if(j == 2)
+					labelIdentifier+="cardtwo";
+				else if(j == 3)
 					labelIdentifier+="cardthree";
-				else if(i == 4)
+				else if(j == 4)
 					labelIdentifier+="cardfour";
-				else if(i == 5)
+				else if(j == 5)
 					labelIdentifier+="cardfive";
-				else if(i == 6)
+				else if(j == 6)
 					labelIdentifier+="cardsix";
-				System.out.println(labelIdentifier+": "+arguments[i]);
-				labels.get(labelIdentifier).setText(arguments[i]);
-				labels.get(labelIdentifier).setVisible(true);
-			}
+				else if(j == 7 && i !=5)
+					labelIdentifier+="leftsplitone";
+				else if(j == 8 && i !=5)
+					labelIdentifier+="leftsplittwo";
+				else if(j == 9 && i !=5)
+					labelIdentifier+="leftsplitthree";
+				else if(j == 10 && i !=5)
+					labelIdentifier+="leftsplitfour";
+				else if(j == 11 && i !=5)
+					labelIdentifier+="leftsplitfive";
+				else if(j == 12 && i !=5)
+					labelIdentifier+="rightsplitone";
+				else if(j == 13 && i !=5)
+					labelIdentifier+="rightsplittwo";
+				else if(j == 14 && i !=5)
+					labelIdentifier+="rightsplitthree";
+				else if(j == 15 && i !=5)
+					labelIdentifier+="rightsplitfour";
+				else if(j == 16 && i !=5)
+					labelIdentifier+="rightsplitfive";
+				else if(j== 17 && i !=5)
+					continue;
+				else if(j == 17 && i == 5)
+					labelIdentifier+="cardtwoseen";
+				
+				labels.get(labelIdentifier).setVisible(false);
+				
+			}	
+		}
+	}
+	/**
+	 * For the dealer's turn, shows their cards
+	 * @param arguments
+	 */
+	private void dealerTurn(String[] arguments) 
+	{
+		lblDealercardtwo.setVisible(false);
+		btnHit.setVisible(false);
+		btnStand.setVisible(false);
+		btnDoubleDown.setVisible(false);
+		btnSplit.setVisible(false);
+		for(int i = 1;i < arguments.length-1; i++)
+		{
+			String labelIdentifier = "lblDealer";
+			if(i == 1)
+				labelIdentifier+="cardone";
+			else if(i == 2)
+				labelIdentifier+="cardtwoseen";
+			else if(i == 3)
+				labelIdentifier+="cardthree";
+			else if(i == 4)
+				labelIdentifier+="cardfour";
+			else if(i == 5)
+				labelIdentifier+="cardfive";
+			else if(i == 6)
+				labelIdentifier+="cardsix";
+			System.out.println(labelIdentifier+": "+arguments[i]);
+			labels.get(labelIdentifier).setText(arguments[i]);
+			labels.get(labelIdentifier).setVisible(true);
+		}
+	}
+	/**
+	 * Does the GUI logic for standing, changing turns or having the dealer go
+	 * @param arguments
+	 */
+	private void handleStand(String[] arguments)
+	{
+		if(playerID == Integer.parseInt(arguments[1]))
+		{
+			lblGamestate.setText("It's currently your turn!");
+			btnHit.setVisible(true);
+			btnStand.setVisible(true);
+			if(Integer.parseInt(arguments[2]) == 1)
+				btnDoubleDown.setVisible(true);
+			if(Integer.parseInt(arguments[3]) == 1)
+				btnSplit.setVisible(true);
 			
 		}
-		else if(msg.startsWith("GameState"))
+		else
 		{
-			this.lblGamestate.setText(msg.split(",")[1]);
-		}
-		else if(msg.startsWith("PlayAgain"))
-		{
-			String[] arguments = msg.split(",");
-			double bet = Double.parseDouble(arguments[1]);
-			lblBet.setText("Current Bet: $"+bet);
-			this.btnReadyToPlay.setVisible(true);
 			btnHit.setVisible(false);
 			btnStand.setVisible(false);
 			btnDoubleDown.setVisible(false);
-			this.lblGamestate.setText("Waiting for other players to finish game and ready up");
-			for(int i = 0; i < 6; i++)
-			{
-				for(int j = 1;j <8; j++)
-				{
-					String labelIdentifier = "";
-					if(i != 5)
-						labelIdentifier = "lblPlayer"+i;
-					else
-						labelIdentifier = "lblDealer";
-					if(j == 1)
-						labelIdentifier+="cardone";
-					else if(j == 2)
-						labelIdentifier+="cardtwo";
-					else if(j == 3)
-						labelIdentifier+="cardthree";
-					else if(j == 4)
-						labelIdentifier+="cardfour";
-					else if(j == 5)
-						labelIdentifier+="cardfive";
-					else if(j == 6)
-						labelIdentifier+="cardsix";
-					else if(j==7 && i !=5)
-						continue;
-					else if(j == 7 && i == 5)
-						labelIdentifier+="cardtwoseen";
-					
-					labels.get(labelIdentifier).setVisible(false);
-					
-				}	
-			}
+			btnSplit.setVisible(false);
+			lblGamestate.setText("You have finished your turn, wait for others to catch up!");
 		}
+	}
+	/**
+	 * Gives a player their new card when they hit
+	 * @param arguments
+	 */
+	private void handleHit(String[] arguments) 
+	{
+		int Id = Integer.parseInt(arguments[1]);
+		int split = Integer.parseInt(arguments[2]);
+		btnDoubleDown.setVisible(false);
+		btnSplit.setVisible(false);
+		for(int i = 3;i < arguments.length-1; i++)
+		{
+			String labelIdentifier = "lblPlayer"+Id;
+			if(split == 0)
+			{
+				if(i == 3)
+					labelIdentifier+="cardone";
+				else if(i == 4)
+					labelIdentifier+="cardtwo";
+				else if(i == 5)
+					labelIdentifier+="cardthree";
+				else if(i == 6)
+					labelIdentifier+="cardfour";
+				else if(i == 7)
+					labelIdentifier+="cardfive";
+				else if(i == 8)
+					labelIdentifier+="cardsix";
+			}
+			else if(split == 1)
+			{
+				if(i == 3)
+					labelIdentifier+="leftsplitone";
+				else if(i == 4)
+					labelIdentifier+="leftsplittwo";
+				else if(i == 5)
+					labelIdentifier+="leftsplitthree";
+				else if(i == 6)
+					labelIdentifier+="leftsplitfour";
+				else if(i == 7)
+					labelIdentifier+="leftsplitfive";
+			}
+			else if(split == 2)
+			{
+				if(i == 3)
+					labelIdentifier+="rightsplitone";
+				else if(i == 4)
+					labelIdentifier+="rightsplittwo";
+				else if(i == 5)
+					labelIdentifier+="rightsplitthree";
+				else if(i == 6)
+					labelIdentifier+="rightsplitfour";
+				else if(i == 7)
+					labelIdentifier+="rightsplitfive";
+			}
+			labels.get(labelIdentifier).setText(arguments[i]);
+			labels.get(labelIdentifier).setVisible(true);
+		}
+	}
+	/**
+	 * deals with a player splitting, moving their cards up to the split card section
+	 * @param arguments
+	 */
+	private void handleSplit(String[] arguments) 
+	{
+		int Id = Integer.parseInt(arguments[1]);
+		if(this.playerID == Id)
+		{
+			btnSplit.setVisible(false);
+			lblBet.setText("Current Bet: $"+arguments[2]);
+		}
+		lblGamestate.setText("You have chosen to split, play the left hand first!");
+		labels.get("lblPlayer"+Id+"cardone").setVisible(false);
+		labels.get("lblPlayer"+Id+"cardtwo").setVisible(false);
+		for(int i = 3; i < arguments.length-1; i++)
+		{
+			String labelIdentifier ="";
+			if(i ==3 || i ==4)
+				labelIdentifier = "lblPlayer"+Id+"leftsplit";
+			else
+				labelIdentifier = "lblPlayer"+Id+"rightsplit";
+			if(i == 3 || i == 5)
+				labelIdentifier += "one";
+			else
+				labelIdentifier += "two";
+			labels.get(labelIdentifier).setText(arguments[i]);
+			labels.get(labelIdentifier).setVisible(true);
+		}
+	}
+	/**
+	 * Ends the game, showing the ending prompts to either play again or exit
+	 * @param arguments
+	 */
+	private void handleEndGame(String[] arguments) 
+	{
+		double newMoney = Double.parseDouble(arguments[3]);
+		lblMoney.setText("Money: $"+newMoney);
+		int won = Integer.parseInt(arguments[2]);
+		int split = Integer.parseInt(arguments[4]);
+		int choice =1;
+		Object[] options = {"Play Again","Stop playing"};
+		if(split == 1)
+		{
+			if(won == 0)
+				JOptionPane.showMessageDialog(null, "Your left hand has lost this round!");
+			else if(won == 1)
+				JOptionPane.showMessageDialog(null, "Your left hand has won this round!");
+			else if(won == 2)
+				JOptionPane.showMessageDialog(null, "Your left hand has tied this round!");
+			else if(won == 3)
+				JOptionPane.showMessageDialog(null, "Your left hand has forfeited this round!");
+		}
+		else if(split == 2)
+		{
+			
+			if(won == 0)
+				choice = JOptionPane.showOptionDialog(this,
+							"Your right hand has lost this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			else if(won == 1)
+				choice = JOptionPane.showOptionDialog(this,
+							"Your right hand has won this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			else if(won == 2)
+				choice = JOptionPane.showOptionDialog(this,
+							"Your right hand has tied this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			else if(won == 3)
+				choice = JOptionPane.showOptionDialog(this,
+							"Your right hand has forfeited this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			
+		}
+		else if(split == 3)
+		{
+			if(won == 0)
+				choice = JOptionPane.showOptionDialog(this,
+							"Your right hand has lost this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			else if(won == 1)
+				choice = JOptionPane.showOptionDialog(this,
+							"Your left hand has won this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			else if(won == 2)
+				choice = JOptionPane.showOptionDialog(this,
+							"Your left hand has tied this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			else if(won == 3)
+				choice = JOptionPane.showOptionDialog(this,
+							"Your left hand has forfeited this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+		}
+		else if(split == 4)
+		{
+			if(won == 0)
+				JOptionPane.showMessageDialog(null, "Your right hand has lost this round!");
+			else if(won == 1)
+				JOptionPane.showMessageDialog(null, "Your right hand has won this round!");
+			else if(won == 2)
+				JOptionPane.showMessageDialog(null, "Your right hand has tied this round!");
+			else if(won == 3)
+				JOptionPane.showMessageDialog(null, "Your right hand has forfeited this round!");
+		}
+		else
+		{
+			if(won == 0)
+				choice = JOptionPane.showOptionDialog(this,
+							"You have lost this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			else if(won == 1)
+				choice = JOptionPane.showOptionDialog(this,
+							"You have won this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			else if(won == 2)
+				choice = JOptionPane.showOptionDialog(this,
+							"You have tied this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			else if(won == 3)
+				choice = JOptionPane.showOptionDialog(this,
+							"You have forfeited this round!",
+							"Would you like to play again?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE,
+							null,
+							options,
+							options[1]);
+			
+		}
+		if(split == 1 || split == 4)
+			return;
+		if(choice == 0)
+		{
+			double newBet = Double.parseDouble(JOptionPane.showInputDialog(this, "Insert next bet: ", "(eg. 500)"));
+			lblBet.setText("Current Bet: $"+newBet);
+			String playAgain = "PlayAgain,"+playerID+","+newBet+",";
+			sendAction(playAgain);	//play another game
+		}
+		else
+			this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); // quit
+	}
+	/**
+	 * Starts up a fresh game with the cards that were dealt
+	 * @param arguments
+	 */
+	private void startUpGame(String[] arguments) 
+	{
+		this.btnReadyToPlay.setVisible(false);
+		int canDoubleDown = Integer.parseInt(arguments[1]);
+		int currTurn = Integer.parseInt(arguments[2]);
+		int canSplit = Integer.parseInt(arguments[4]);
+		if(playerID == currTurn)
+		{
+			lblGamestate.setText("It's currently your turn!");
+			btnHit.setVisible(true);
+			btnStand.setVisible(true);
+			if(canDoubleDown == 1)
+				btnDoubleDown.setVisible(true);
+			if(canSplit == 1)
+				this.btnSplit.setVisible(true);
+		}
+		else
+			lblGamestate.setText("It's currently someone else's turn!");
+		String dealerCard = arguments[3];
+		lblDealercardone.setText(dealerCard);
+		lblDealercardone.setVisible(true);
+		lblDealercardtwo.setVisible(true);
+		for(int i = 5; i < arguments.length-1; i+=3)
+		{
+			int playerToGiveCards = Integer.parseInt(arguments[i]);
+			String cardone = arguments[i+1];
+			String cardtwo = arguments[i+2];
+			String labelIdentifier = "lblPlayer"+playerToGiveCards+"cardone";
+			String labelIdentifier2 = "lblPlayer"+playerToGiveCards+"cardtwo";
+			labels.get(labelIdentifier).setText(cardone);
+			labels.get(labelIdentifier2).setText(cardtwo);
+			labels.get(labelIdentifier).setVisible(true);
+			labels.get(labelIdentifier2).setVisible(true);
+		}
+	}
+	/**
+	 * Handles a disconnection, removing their cards and name
+	 * @param arguments
+	 */
+	private void handleDisconnect(String[] arguments) 
+	{
+		int Id = Integer.parseInt(arguments[1]);
+		String label = "lblPlayer"+Id;
+		labels.get(label).setText("");
+		labels.get("lblPlayer"+Id+"cardone").setVisible(false);
+		labels.get("lblPlayer"+Id+"cardtwo").setVisible(false);
+		labels.get("lblPlayer"+Id+"cardthree").setVisible(false);
+		labels.get("lblPlayer"+Id+"cardfour").setVisible(false);
+		labels.get("lblPlayer"+Id+"cardfive").setVisible(false);
+		labels.get("lblPlayer"+Id+"cardsix").setVisible(false);
 	}
 
 	/**
@@ -621,12 +838,12 @@ public class GameClient extends JFrame implements Runnable
 		
 		lblPlayer1rightsplitfive = new JLabel("<html>10<br>♠</html>");
 		lblPlayer1rightsplitfive.setVisible(false);
-		((JLabel) lblPlayer1rightsplitfive).setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer1rightsplitfive.setVerticalAlignment(SwingConstants.TOP);
 		lblPlayer1rightsplitfive.setOpaque(true);
 		lblPlayer1rightsplitfive.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1rightsplitfive.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1rightsplitfive.setBackground(SystemColor.controlHighlight);
-		lblPlayer1rightsplitfive.setBounds(289, 160, 30, 50);
+		lblPlayer1rightsplitfive.setBounds(289, 143, 30, 50);
 		contentPane.add(lblPlayer1rightsplitfive);
 		
 		lblPlayer1rightsplitfour = new JLabel("<html>10<br>♠</html>");
@@ -636,7 +853,7 @@ public class GameClient extends JFrame implements Runnable
 		lblPlayer1rightsplitfour.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1rightsplitfour.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1rightsplitfour.setBackground(SystemColor.controlHighlight);
-		lblPlayer1rightsplitfour.setBounds(259, 160, 30, 50);
+		lblPlayer1rightsplitfour.setBounds(259, 143, 30, 50);
 		contentPane.add(lblPlayer1rightsplitfour);
 		
 		lblPlayer1rightsplitthree = new JLabel("<html>10<br>♠</html>");
@@ -646,7 +863,7 @@ public class GameClient extends JFrame implements Runnable
 		lblPlayer1rightsplitthree.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1rightsplitthree.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1rightsplitthree.setBackground(SystemColor.controlHighlight);
-		lblPlayer1rightsplitthree.setBounds(229, 160, 30, 50);
+		lblPlayer1rightsplitthree.setBounds(229, 143, 30, 50);
 		contentPane.add(lblPlayer1rightsplitthree);
 		
 		lblPlayer1rightsplittwo = new JLabel("<html>10<br>♠</html>");
@@ -656,7 +873,7 @@ public class GameClient extends JFrame implements Runnable
 		lblPlayer1rightsplittwo.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1rightsplittwo.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1rightsplittwo.setBackground(SystemColor.controlHighlight);
-		lblPlayer1rightsplittwo.setBounds(199, 160, 30, 50);
+		lblPlayer1rightsplittwo.setBounds(199, 143, 30, 50);
 		contentPane.add(lblPlayer1rightsplittwo);
 		
 		lblPlayer1rightsplitone = new JLabel("<html>10<br>♠</html>");
@@ -666,7 +883,7 @@ public class GameClient extends JFrame implements Runnable
 		lblPlayer1rightsplitone.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1rightsplitone.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1rightsplitone.setBackground(SystemColor.controlHighlight);
-		lblPlayer1rightsplitone.setBounds(169, 160, 30, 50);
+		lblPlayer1rightsplitone.setBounds(169, 143, 30, 50);
 		contentPane.add(lblPlayer1rightsplitone);
 		
 		lblPlayer1leftsplitfive = new JLabel("<html>10<br>♠</html>");
@@ -676,7 +893,7 @@ public class GameClient extends JFrame implements Runnable
 		lblPlayer1leftsplitfive.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1leftsplitfive.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1leftsplitfive.setBackground(SystemColor.controlHighlight);
-		lblPlayer1leftsplitfive.setBounds(120, 160, 30, 50);
+		lblPlayer1leftsplitfive.setBounds(120, 143, 30, 50);
 		contentPane.add(lblPlayer1leftsplitfive);
 		
 		lblPlayer1leftsplitfour = new JLabel("<html>10<br>♠</html>");
@@ -686,7 +903,7 @@ public class GameClient extends JFrame implements Runnable
 		lblPlayer1leftsplitfour.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1leftsplitfour.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1leftsplitfour.setBackground(SystemColor.controlHighlight);
-		lblPlayer1leftsplitfour.setBounds(90, 160, 30, 50);
+		lblPlayer1leftsplitfour.setBounds(90, 143, 30, 50);
 		contentPane.add(lblPlayer1leftsplitfour);
 		
 		lblPlayer1leftsplitthree = new JLabel("<html>10<br>♠</html>");
@@ -696,7 +913,7 @@ public class GameClient extends JFrame implements Runnable
 		lblPlayer1leftsplitthree.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1leftsplitthree.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1leftsplitthree.setBackground(SystemColor.controlHighlight);
-		lblPlayer1leftsplitthree.setBounds(60, 160, 30, 50);
+		lblPlayer1leftsplitthree.setBounds(60, 143, 30, 50);
 		contentPane.add(lblPlayer1leftsplitthree);
 		
 		lblPlayer1leftsplittwo = new JLabel("<html>10<br>♠</html>");
@@ -706,7 +923,7 @@ public class GameClient extends JFrame implements Runnable
 		lblPlayer1leftsplittwo.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1leftsplittwo.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1leftsplittwo.setBackground(SystemColor.controlHighlight);
-		lblPlayer1leftsplittwo.setBounds(30, 160, 30, 50);
+		lblPlayer1leftsplittwo.setBounds(30, 143, 30, 50);
 		contentPane.add(lblPlayer1leftsplittwo);
 		
 		lblPlayer1leftsplitone = new JLabel("<html>10<br>♠</html>");
@@ -716,8 +933,308 @@ public class GameClient extends JFrame implements Runnable
 		lblPlayer1leftsplitone.setFont(new Font("Dialog", Font.BOLD, 20));
 		lblPlayer1leftsplitone.setBorder(BorderFactory.createLineBorder(Color.black));
 		lblPlayer1leftsplitone.setBackground(SystemColor.controlHighlight);
-		lblPlayer1leftsplitone.setBounds(0, 160, 30, 50);
+		lblPlayer1leftsplitone.setBounds(0, 143, 30, 50);
 		contentPane.add(lblPlayer1leftsplitone);
+		
+		lblPlayer2rightsplitfive = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2rightsplitfive.setVisible(false);
+		lblPlayer2rightsplitfive.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2rightsplitfive.setOpaque(true);
+		lblPlayer2rightsplitfive.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2rightsplitfive.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2rightsplitfive.setBackground(SystemColor.controlHighlight);
+		lblPlayer2rightsplitfive.setBounds(289, 220, 30, 50);
+		contentPane.add(lblPlayer2rightsplitfive);
+		
+		lblPlayer2rightsplitfour = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2rightsplitfour.setVisible(false);
+		lblPlayer2rightsplitfour.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2rightsplitfour.setOpaque(true);
+		lblPlayer2rightsplitfour.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2rightsplitfour.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2rightsplitfour.setBackground(SystemColor.controlHighlight);
+		lblPlayer2rightsplitfour.setBounds(259, 220, 30, 50);
+		contentPane.add(lblPlayer2rightsplitfour);
+		
+		lblPlayer2rightsplitthree = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2rightsplitthree.setVisible(false);
+		lblPlayer2rightsplitthree.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2rightsplitthree.setOpaque(true);
+		lblPlayer2rightsplitthree.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2rightsplitthree.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2rightsplitthree.setBackground(SystemColor.controlHighlight);
+		lblPlayer2rightsplitthree.setBounds(229, 220, 30, 50);
+		contentPane.add(lblPlayer2rightsplitthree);
+		
+		lblPlayer2rightsplittwo = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2rightsplittwo.setVisible(false);
+		lblPlayer2rightsplittwo.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2rightsplittwo.setOpaque(true);
+		lblPlayer2rightsplittwo.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2rightsplittwo.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2rightsplittwo.setBackground(SystemColor.controlHighlight);
+		lblPlayer2rightsplittwo.setBounds(199, 220, 30, 50);
+		contentPane.add(lblPlayer2rightsplittwo);
+		
+		lblPlayer2rightsplitone = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2rightsplitone.setVisible(false);
+		lblPlayer2rightsplitone.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2rightsplitone.setOpaque(true);
+		lblPlayer2rightsplitone.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2rightsplitone.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2rightsplitone.setBackground(SystemColor.controlHighlight);
+		lblPlayer2rightsplitone.setBounds(169, 220, 30, 50);
+		contentPane.add(lblPlayer2rightsplitone);
+		
+		lblPlayer2leftsplitfive = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2leftsplitfive.setVisible(false);
+		lblPlayer2leftsplitfive.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2leftsplitfive.setOpaque(true);
+		lblPlayer2leftsplitfive.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2leftsplitfive.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2leftsplitfive.setBackground(SystemColor.controlHighlight);
+		lblPlayer2leftsplitfive.setBounds(120, 220, 30, 50);
+		contentPane.add(lblPlayer2leftsplitfive);
+		
+		lblPlayer2leftsplitfour = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2leftsplitfour.setVisible(false);
+		lblPlayer2leftsplitfour.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2leftsplitfour.setOpaque(true);
+		lblPlayer2leftsplitfour.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2leftsplitfour.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2leftsplitfour.setBackground(SystemColor.controlHighlight);
+		lblPlayer2leftsplitfour.setBounds(90, 220, 30, 50);
+		contentPane.add(lblPlayer2leftsplitfour);
+		
+		lblPlayer2leftsplitthree = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2leftsplitthree.setVisible(false);
+		lblPlayer2leftsplitthree.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2leftsplitthree.setOpaque(true);
+		lblPlayer2leftsplitthree.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2leftsplitthree.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2leftsplitthree.setBackground(SystemColor.controlHighlight);
+		lblPlayer2leftsplitthree.setBounds(60, 220, 30, 50);
+		contentPane.add(lblPlayer2leftsplitthree);
+		
+		lblPlayer2leftsplittwo = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2leftsplittwo.setVisible(false);
+		lblPlayer2leftsplittwo.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2leftsplittwo.setOpaque(true);
+		lblPlayer2leftsplittwo.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2leftsplittwo.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2leftsplittwo.setBackground(SystemColor.controlHighlight);
+		lblPlayer2leftsplittwo.setBounds(30, 220, 30, 50);
+		contentPane.add(lblPlayer2leftsplittwo);
+		
+		lblPlayer2leftsplitone = new JLabel("<html>10<br>♠</html>");
+		lblPlayer2leftsplitone.setVisible(false);
+		lblPlayer2leftsplitone.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer2leftsplitone.setOpaque(true);
+		lblPlayer2leftsplitone.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer2leftsplitone.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer2leftsplitone.setBackground(SystemColor.controlHighlight);
+		lblPlayer2leftsplitone.setBounds(0, 220, 30, 50);
+		contentPane.add(lblPlayer2leftsplitone);
+		
+		lblPlayer3rightsplitfive = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3rightsplitfive.setVisible(false);
+		lblPlayer3rightsplitfive.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3rightsplitfive.setOpaque(true);
+		lblPlayer3rightsplitfive.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3rightsplitfive.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3rightsplitfive.setBackground(SystemColor.controlHighlight);
+		lblPlayer3rightsplitfive.setBounds(998, 143, 30, 50);
+		contentPane.add(lblPlayer3rightsplitfive);
+		
+		lblPlayer3rightsplitfour = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3rightsplitfour.setVisible(false);
+		lblPlayer3rightsplitfour.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3rightsplitfour.setOpaque(true);
+		lblPlayer3rightsplitfour.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3rightsplitfour.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3rightsplitfour.setBackground(SystemColor.controlHighlight);
+		lblPlayer3rightsplitfour.setBounds(968, 143, 30, 50);
+		contentPane.add(lblPlayer3rightsplitfour);
+		
+		lblPlayer3rightsplitthree = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3rightsplitthree.setVisible(false);
+		lblPlayer3rightsplitthree.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3rightsplitthree.setOpaque(true);
+		lblPlayer3rightsplitthree.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3rightsplitthree.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3rightsplitthree.setBackground(SystemColor.controlHighlight);
+		lblPlayer3rightsplitthree.setBounds(938, 143, 30, 50);
+		contentPane.add(lblPlayer3rightsplitthree);
+		
+		lblPlayer3rightsplittwo = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3rightsplittwo.setVisible(false);
+		lblPlayer3rightsplittwo.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3rightsplittwo.setOpaque(true);
+		lblPlayer3rightsplittwo.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3rightsplittwo.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3rightsplittwo.setBackground(SystemColor.controlHighlight);
+		lblPlayer3rightsplittwo.setBounds(908, 143, 30, 50);
+		contentPane.add(lblPlayer3rightsplittwo);
+		
+		lblPlayer3rightsplitone = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3rightsplitone.setVisible(false);
+		lblPlayer3rightsplitone.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3rightsplitone.setOpaque(true);
+		lblPlayer3rightsplitone.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3rightsplitone.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3rightsplitone.setBackground(SystemColor.controlHighlight);
+		lblPlayer3rightsplitone.setBounds(878, 143, 30, 50);
+		contentPane.add(lblPlayer3rightsplitone);
+		
+		lblPlayer3leftsplitfive = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3leftsplitfive.setVisible(false);
+		lblPlayer3leftsplitfive.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3leftsplitfive.setOpaque(true);
+		lblPlayer3leftsplitfive.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3leftsplitfive.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3leftsplitfive.setBackground(SystemColor.controlHighlight);
+		lblPlayer3leftsplitfive.setBounds(829, 143, 30, 50);
+		contentPane.add(lblPlayer3leftsplitfive);
+		
+		lblPlayer3leftsplitfour = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3leftsplitfour.setVisible(false);
+		lblPlayer3leftsplitfour.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3leftsplitfour.setOpaque(true);
+		lblPlayer3leftsplitfour.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3leftsplitfour.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3leftsplitfour.setBackground(SystemColor.controlHighlight);
+		lblPlayer3leftsplitfour.setBounds(799, 143, 30, 50);
+		contentPane.add(lblPlayer3leftsplitfour);
+		
+		lblPlayer3leftsplitthree = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3leftsplitthree.setVisible(false);
+		lblPlayer3leftsplitthree.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3leftsplitthree.setOpaque(true);
+		lblPlayer3leftsplitthree.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3leftsplitthree.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3leftsplitthree.setBackground(SystemColor.controlHighlight);
+		lblPlayer3leftsplitthree.setBounds(769, 143, 30, 50);
+		contentPane.add(lblPlayer3leftsplitthree);
+		
+		lblPlayer3leftsplittwo = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3leftsplittwo.setVisible(false);
+		lblPlayer3leftsplittwo.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3leftsplittwo.setOpaque(true);
+		lblPlayer3leftsplittwo.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3leftsplittwo.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3leftsplittwo.setBackground(SystemColor.controlHighlight);
+		lblPlayer3leftsplittwo.setBounds(739, 143, 30, 50);
+		contentPane.add(lblPlayer3leftsplittwo);
+		
+		lblPlayer3leftsplitone = new JLabel("<html>10<br>♠</html>");
+		lblPlayer3leftsplitone.setVisible(false);
+		lblPlayer3leftsplitone.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer3leftsplitone.setOpaque(true);
+		lblPlayer3leftsplitone.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer3leftsplitone.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer3leftsplitone.setBackground(SystemColor.controlHighlight);
+		lblPlayer3leftsplitone.setBounds(709, 143, 30, 50);
+		contentPane.add(lblPlayer3leftsplitone);
+		
+		lblPlayer4rightsplitfive = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4rightsplitfive.setVisible(false);
+		lblPlayer4rightsplitfive.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4rightsplitfive.setOpaque(true);
+		lblPlayer4rightsplitfive.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4rightsplitfive.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4rightsplitfive.setBackground(SystemColor.controlHighlight);
+		lblPlayer4rightsplitfive.setBounds(998, 230, 30, 50);
+		contentPane.add(lblPlayer4rightsplitfive);
+		
+		lblPlayer4rightsplitfour = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4rightsplitfour.setVisible(false);
+		lblPlayer4rightsplitfour.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4rightsplitfour.setOpaque(true);
+		lblPlayer4rightsplitfour.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4rightsplitfour.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4rightsplitfour.setBackground(SystemColor.controlHighlight);
+		lblPlayer4rightsplitfour.setBounds(968, 230, 30, 50);
+		contentPane.add(lblPlayer4rightsplitfour);
+		
+		lblPlayer4rightsplitthree = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4rightsplitthree.setVisible(false);
+		lblPlayer4rightsplitthree.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4rightsplitthree.setOpaque(true);
+		lblPlayer4rightsplitthree.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4rightsplitthree.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4rightsplitthree.setBackground(SystemColor.controlHighlight);
+		lblPlayer4rightsplitthree.setBounds(938, 230, 30, 50);
+		contentPane.add(lblPlayer4rightsplitthree);
+		
+		lblPlayer4rightsplittwo = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4rightsplittwo.setVisible(false);
+		lblPlayer4rightsplittwo.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4rightsplittwo.setOpaque(true);
+		lblPlayer4rightsplittwo.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4rightsplittwo.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4rightsplittwo.setBackground(SystemColor.controlHighlight);
+		lblPlayer4rightsplittwo.setBounds(908, 230, 30, 50);
+		contentPane.add(lblPlayer4rightsplittwo);
+		
+		lblPlayer4rightsplitone = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4rightsplitone.setVisible(false);
+		lblPlayer4rightsplitone.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4rightsplitone.setOpaque(true);
+		lblPlayer4rightsplitone.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4rightsplitone.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4rightsplitone.setBackground(SystemColor.controlHighlight);
+		lblPlayer4rightsplitone.setBounds(878, 230, 30, 50);
+		contentPane.add(lblPlayer4rightsplitone);
+		
+		lblPlayer4leftsplitfive = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4leftsplitfive.setVisible(false);
+		lblPlayer4leftsplitfive.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4leftsplitfive.setOpaque(true);
+		lblPlayer4leftsplitfive.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4leftsplitfive.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4leftsplitfive.setBackground(SystemColor.controlHighlight);
+		lblPlayer4leftsplitfive.setBounds(829, 230, 30, 50);
+		contentPane.add(lblPlayer4leftsplitfive);
+		
+		lblPlayer4leftsplitfour = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4leftsplitfour.setVisible(false);
+		lblPlayer4leftsplitfour.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4leftsplitfour.setOpaque(true);
+		lblPlayer4leftsplitfour.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4leftsplitfour.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4leftsplitfour.setBackground(SystemColor.controlHighlight);
+		lblPlayer4leftsplitfour.setBounds(799, 230, 30, 50);
+		contentPane.add(lblPlayer4leftsplitfour);
+		
+		lblPlayer4leftsplitthree = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4leftsplitthree.setVisible(false);
+		lblPlayer4leftsplitthree.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4leftsplitthree.setOpaque(true);
+		lblPlayer4leftsplitthree.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4leftsplitthree.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4leftsplitthree.setBackground(SystemColor.controlHighlight);
+		lblPlayer4leftsplitthree.setBounds(769, 230, 30, 50);
+		contentPane.add(lblPlayer4leftsplitthree);
+		
+		lblPlayer4leftsplittwo = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4leftsplittwo.setVisible(false);
+		lblPlayer4leftsplittwo.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4leftsplittwo.setOpaque(true);
+		lblPlayer4leftsplittwo.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4leftsplittwo.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4leftsplittwo.setBackground(SystemColor.controlHighlight);
+		lblPlayer4leftsplittwo.setBounds(739, 230, 30, 50);
+		contentPane.add(lblPlayer4leftsplittwo);
+		
+		lblPlayer4leftsplitone = new JLabel("<html>10<br>♠</html>");
+		lblPlayer4leftsplitone.setVisible(false);
+		lblPlayer4leftsplitone.setVerticalAlignment(SwingConstants.TOP);
+		lblPlayer4leftsplitone.setOpaque(true);
+		lblPlayer4leftsplitone.setFont(new Font("Dialog", Font.BOLD, 20));
+		lblPlayer4leftsplitone.setBorder(BorderFactory.createLineBorder(Color.black));
+		lblPlayer4leftsplitone.setBackground(SystemColor.controlHighlight);
+		lblPlayer4leftsplitone.setBounds(709, 230, 30, 50);
+		contentPane.add(lblPlayer4leftsplitone);
 		
 		lblDealercardsix = new JLabel("<html>10<br>♠</html>");
 		lblDealercardsix.setVisible(false);
@@ -1121,6 +1638,7 @@ public class GameClient extends JFrame implements Runnable
 		contentPane.add(lblBet);
 		
 		btnHit = new JButton("Hit");
+		btnHit.setToolTipText("Hit on your turn to add another card to your hand");
 		btnHit.setVisible(false);
 		btnHit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1132,6 +1650,7 @@ public class GameClient extends JFrame implements Runnable
 		contentPane.add(btnHit);
 		
 		btnStand = new JButton("Stand");
+		btnStand.setToolTipText("Stand to end your turn if you think you can beat the dealer");
 		btnStand.setVisible(false);
 		btnStand.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1143,6 +1662,7 @@ public class GameClient extends JFrame implements Runnable
 		contentPane.add(btnStand);
 		
 		btnDoubleDown = new JButton("Double Down");
+		btnDoubleDown.setToolTipText("Double's your current bet and gives you one more card as well as ending your turn");
 		btnDoubleDown.setVisible(false);
 		btnDoubleDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1184,6 +1704,7 @@ public class GameClient extends JFrame implements Runnable
 		contentPane.add(lblPlayer4);
 		
 		btnReadyToPlay = new JButton("Ready to play");
+		btnReadyToPlay.setToolTipText("Ready up to be in the next game");
 		btnReadyToPlay.setVisible(false);
 		btnReadyToPlay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1197,7 +1718,14 @@ public class GameClient extends JFrame implements Runnable
 		contentPane.add(btnReadyToPlay);
 		
 		btnSplit = new JButton("Split");
+		btnSplit.setToolTipText("Split your cards to double your bet and let you play two hands at once");
 		btnSplit.setVisible(false);
+		btnSplit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String serverAction = "Split,"+playerID+",";
+				sendAction(serverAction);
+			}
+		});
 		btnSplit.setBounds(840, 547, 132, 34);
 		contentPane.add(btnSplit);
 		
@@ -1276,7 +1804,47 @@ public class GameClient extends JFrame implements Runnable
 		labels.put("lblPlayer0leftsplitfour",lblPlayer0leftsplitfour);
 		labels.put("lblPlayer0leftsplitthree",lblPlayer0leftsplitthree);
 		labels.put("lblPlayer0leftsplittwo",lblPlayer0leftsplittwo);
-
+		labels.put("lblPlayer0leftsplitone",lblPlayer0leftsplitone);
+		labels.put("lblPlayer1rightsplitfive",lblPlayer1rightsplitfive);
+		labels.put("lblPlayer1rightsplitfour",lblPlayer1rightsplitfour);
+		labels.put("lblPlayer1rightsplitthree",lblPlayer1rightsplitthree);
+		labels.put("lblPlayer1rightsplittwo",lblPlayer1rightsplittwo);
+		labels.put("lblPlayer1rightsplitone",lblPlayer1rightsplitone);
+		labels.put("lblPlayer1leftsplitfive",lblPlayer1leftsplitfive);
+		labels.put("lblPlayer1leftsplitfour",lblPlayer1leftsplitfour);
+		labels.put("lblPlayer1leftsplitthree",lblPlayer1leftsplitthree);
+		labels.put("lblPlayer1leftsplittwo",lblPlayer1leftsplittwo);
+		labels.put("lblPlayer1leftsplitone",lblPlayer1leftsplitone);
+		labels.put("lblPlayer2rightsplitfive",lblPlayer2rightsplitfive);
+		labels.put("lblPlayer2rightsplitfour",lblPlayer2rightsplitfour);
+		labels.put("lblPlayer2rightsplitthree",lblPlayer2rightsplitthree);
+		labels.put("lblPlayer2rightsplittwo",lblPlayer2rightsplittwo);
+		labels.put("lblPlayer2rightsplitone",lblPlayer2rightsplitone);
+		labels.put("lblPlayer2leftsplitfive",lblPlayer2leftsplitfive);
+		labels.put("lblPlayer2leftsplitfour",lblPlayer2leftsplitfour);
+		labels.put("lblPlayer2leftsplitthree",lblPlayer2leftsplitthree);
+		labels.put("lblPlayer2leftsplittwo",lblPlayer2leftsplittwo);
+		labels.put("lblPlayer2leftsplitone",lblPlayer2leftsplitone);
+		labels.put("lblPlayer3rightsplitfive",lblPlayer3rightsplitfive);
+		labels.put("lblPlayer3rightsplitfour",lblPlayer3rightsplitfour);
+		labels.put("lblPlayer3rightsplitthree",lblPlayer3rightsplitthree);
+		labels.put("lblPlayer3rightsplittwo",lblPlayer3rightsplittwo);
+		labels.put("lblPlayer3rightsplitone",lblPlayer3rightsplitone);
+		labels.put("lblPlayer3leftsplitfive",lblPlayer3leftsplitfive);
+		labels.put("lblPlayer3leftsplitfour",lblPlayer3leftsplitfour);
+		labels.put("lblPlayer3leftsplitthree",lblPlayer3leftsplitthree);
+		labels.put("lblPlayer3leftsplittwo",lblPlayer3leftsplittwo);
+		labels.put("lblPlayer3leftsplitone",lblPlayer3leftsplitone);
+		labels.put("lblPlayer4rightsplitfive",lblPlayer4rightsplitfive);
+		labels.put("lblPlayer4rightsplitfour",lblPlayer4rightsplitfour);
+		labels.put("lblPlayer4rightsplitthree",lblPlayer4rightsplitthree);
+		labels.put("lblPlayer4rightsplittwo",lblPlayer4rightsplittwo);
+		labels.put("lblPlayer4rightsplitone",lblPlayer4rightsplitone);
+		labels.put("lblPlayer4leftsplitfive",lblPlayer4leftsplitfive);
+		labels.put("lblPlayer4leftsplitfour",lblPlayer4leftsplitfour);
+		labels.put("lblPlayer4leftsplitthree",lblPlayer4leftsplitthree);
+		labels.put("lblPlayer4leftsplittwo",lblPlayer4leftsplittwo);
+		labels.put("lblPlayer4leftsplitone",lblPlayer4leftsplitone);
 		
 		setVisible(true);
 	}

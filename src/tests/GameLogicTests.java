@@ -69,15 +69,15 @@ public class GameLogicTests
 		Card testCardTwo = new Card(6,1);
 		assertEquals(testPlayer.getName(), "john");
 		assertEquals((int)testPlayer.getMoney(), 1000);
-		testPlayer.hit(testCardOne);
-		assertEquals(testPlayer.getBlackjackScore(),8);
-		testPlayer.hit(testCardTwo);
-		assertEquals(testPlayer.getBlackjackScore(),14);
-		testPlayer.setWon(0);
+		testPlayer.hit(testCardOne,0);
+		assertEquals(testPlayer.getBlackjackScore(0),8);
+		testPlayer.hit(testCardTwo,0);
+		assertEquals(testPlayer.getBlackjackScore(0),14);
+		testPlayer.setWon(0,0);
 		testPlayer.changeMoneyAmount();
 		assertEquals((int)testPlayer.getMoney(),980);
-		testPlayer.prepForNewGame();
-		assertEquals(testPlayer.getBlackjackScore(), 0);
+		testPlayer.prepForNewGame(0);
+		assertEquals(testPlayer.getBlackjackScore(0), 0);
 		
 		
 	}

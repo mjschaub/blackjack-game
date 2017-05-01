@@ -129,7 +129,10 @@ public class Hand
 		}
 		return cardTxt;
 	}
-	
+	/**
+	 * checks if a hand is able to be split
+	 * @return true or false depending on if a split is possible
+	 */
 	public boolean isAbleToSplit()
 	{
 		if(hand.get(0).getSplitValue() == hand.get(1).getSplitValue())

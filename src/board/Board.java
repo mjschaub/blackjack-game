@@ -47,32 +47,32 @@ public class Board
 			for(int i = 0; i < numPlayers;i++)
 			{
 				Player currPlayer = this.getPlayerByID(i);
-				dealPlayerCard(i);
-				dealPlayerCard(i);
+				dealPlayerCard(i,0);
+				dealPlayerCard(i,0);
 				if(dealer.getBlackJackScore() == 21)
 				{	
-					if(currPlayer.getBlackjackScore() == 21)
+					if(currPlayer.getBlackjackScore(0) == 21)
 					{
-						setPlayerWonOrLoss(currPlayer, 2);
+						setPlayerWonOrLoss(currPlayer, 2,0);
 					}
 					else
 					{
-						setPlayerWonOrLoss(currPlayer, 0);
+						setPlayerWonOrLoss(currPlayer, 0,0);
 					}
 				}
-				if(currPlayer.getBlackjackScore() == 21)
+				if(currPlayer.getBlackjackScore(0) == 21)
 				{
-					setPlayerWonOrLoss(currPlayer, 1);
+					setPlayerWonOrLoss(currPlayer, 1,0);
 				}
 				//show user his/her own and dealer cards
 				//prompt to ask whether they want to hit or stand
 				int action = 0; //connect to user depending on what he wants to do
 				while(action == 0)
 				{
-					dealPlayerCard(i);
-					if(currPlayer.getBlackjackScore() > 21)
+					dealPlayerCard(i,0);
+					if(currPlayer.getBlackjackScore(0) > 21)
 					{
-						setPlayerWonOrLoss(currPlayer, 0);
+						setPlayerWonOrLoss(currPlayer, 0,0);
 					}
 					//prompt again
 					if(action == 1)
@@ -87,23 +87,23 @@ public class Board
 				if(dealer.getBlackJackScore() > 21)
 				{
 					for(int i = 0; i < numPlayers; i++)
-						setPlayerWonOrLoss(getPlayerByID(i),1);
+						setPlayerWonOrLoss(getPlayerByID(i),1,0);
 				}
 			}
 			for(int i = 0; i < numPlayers;i++)
 			{
 				Player currPlayer = this.getPlayerByID(i);
-				if(currPlayer.getBlackjackScore() > dealer.getBlackJackScore())
+				if(currPlayer.getBlackjackScore(0) > dealer.getBlackJackScore())
 				{
-					setPlayerWonOrLoss(currPlayer, 1);
+					setPlayerWonOrLoss(currPlayer, 1,0);
 				}
-				else if(currPlayer.getBlackjackScore() < dealer.getBlackJackScore())
+				else if(currPlayer.getBlackjackScore(0) < dealer.getBlackJackScore())
 				{
-					setPlayerWonOrLoss(currPlayer, 0);
+					setPlayerWonOrLoss(currPlayer, 0,0);
 				}
 				else
 				{
-					setPlayerWonOrLoss(currPlayer, 2);
+					setPlayerWonOrLoss(currPlayer, 2,0);
 				}
 			}
 			
@@ -188,10 +188,10 @@ public class Board
 	 * deals a player a card for whoever's turn it is
 	 * @param turn the turn it is
 	 */
-	public void dealPlayerCard(int turn)
+	public void dealPlayerCard(int turn, int hand)
 	{
 		Player currPlayer = getPlayerByID(turn);
-		currPlayer.hit(gameDeck.dealCard());
+		currPlayer.hit(gameDeck.dealCard(), hand);
 	
 	}
 	/**
@@ -206,10 +206,10 @@ public class Board
 	 * @param curr the current player
 	 * @param won the integer value of winning/losing/a tie
 	 */
-	public void setPlayerWonOrLoss(Player curr, int won)
+	public void setPlayerWonOrLoss(Player curr, int won, int split)
 	{
-		curr.setWon(won);
-		curr.prepForNewGame();
+		curr.setWon(won,split);
+		curr.prepForNewGame(split);
 	}
 	/**
 	 * shuffles the game board's deck

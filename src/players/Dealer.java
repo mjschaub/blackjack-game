@@ -76,6 +76,9 @@ public class Dealer
 	{
 		this.turn++;
 	}
+	/**
+	 * empties a dealer's hand after the game is over
+	 */
 	public void clearHand()
 	{
 		this.dealerHand.emptyHand();
