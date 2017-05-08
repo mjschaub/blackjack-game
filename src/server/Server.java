@@ -188,19 +188,26 @@ public class Server implements Runnable
 		else if(msg.startsWith("Disconnect"))
 		{
 			int idOfPlayerLeaving = Integer.parseInt(arguments[1]);
+			int exitAfterTurn = Integer.parseInt(arguments[2]);
 			Player currPlayer = gameBoard.getPlayerByID(idOfPlayerLeaving);
 			if(numPlayersReady.contains(gameBoard.getPlayerByID(idOfPlayerLeaving)))
 			{
-				if(numPlayersReady.get(idxTurn) == currPlayer)
+				if(exitAfterTurn == 0 && numPlayersReady.get(idxTurn) == currPlayer)
+				{
+					standTurn();
+					split = 0;
+				}
+				else if(exitAfterTurn == 1 && gameBoard.getPlayerByID(idOfPlayerLeaving) == currPlayer)
 				{
 					standTurn();
 					split = 0;
 				}
 				numPlayersReady.remove(gameBoard.getPlayerByID(idOfPlayerLeaving));
 			}
-			gameBoard.playerHasLeft(idOfPlayerLeaving);
+			
 			String actionForClients = "Disconnected,"+idOfPlayerLeaving+",";
 			sendActionsToEveryone(actionForClients);
+			gameBoard.playerHasLeft(idOfPlayerLeaving);
 			
 		}
 		else if(msg.startsWith("Ping"))
@@ -290,6 +297,11 @@ public class Server implements Runnable
 							showDealerCards+=dealerCards.get(j).getImageString()+",";
 						}
 						sendPackets(showDealerCards.getBytes(),currPlayer.address,currPlayer.port);
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 						String gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"2"+","+currPlayer.getMoney()+","+split+",";;
 						this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
 					}
@@ -304,6 +316,11 @@ public class Server implements Runnable
 							showDealerCards+=dealerCards.get(j).getImageString()+",";
 						}
 						sendPackets(showDealerCards.getBytes(),currPlayer.address,currPlayer.port);
+						try {
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 						String gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+split+",";;
 						this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
 					}
@@ -341,19 +358,22 @@ public class Server implements Runnable
 			gameBoard.setPlayerWonOrLoss(currPlayer, 0,split);
 			String gameEnd;
 			if(split == 0)
-				gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+0+",";
+				gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"0"+",";
 			else if(split == 1)
-				gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+1+",";
+			{
+				gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"1"+",";
+				String gameState = "GameState,You are now playing your right hand!";
+				sendPackets(gameState.getBytes(),gameBoard.getPlayerByID(Id).address, gameBoard.getPlayerByID(Id).port);
+			}
 			else
 			{
 				if(currPlayer.leftHand.getCardCount() == 0)
-					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+2+",";
+					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"2"+",";
 				else
-					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+4+",";
+					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"4"+",";
 			}
 			this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
-			//standTurnWithoutDealer();
-			if(numPlayersReady.contains(gameBoard.getPlayerByID(Id)))
+			if(numPlayersReady.contains(gameBoard.getPlayerByID(Id)) && split == 0)
 				numPlayersReady.remove(gameBoard.getPlayerByID(Id));
 			standTurn();
 		}
@@ -392,21 +412,24 @@ public class Server implements Runnable
 		Player currPlayer = gameBoard.getPlayerByID(Id);
 		currPlayer.setCurrBet(.5*currPlayer.getCurrBet());
 		gameBoard.setPlayerWonOrLoss(currPlayer, 0,split);
-		//standTurnWithoutDealer();
 		if(numPlayersReady.contains(gameBoard.getPlayerByID(Id)))
 			numPlayersReady.remove(gameBoard.getPlayerByID(Id));
 		standTurn();
 		String end;
 		if(split == 0)
-			end = "EndGame,"+currPlayer.getPlayerNum()+","+"3"+","+currPlayer.getMoney()+","+0+",";
+			end = "EndGame,"+currPlayer.getPlayerNum()+","+"3"+","+currPlayer.getMoney()+","+"0"+",";
 		else if(split == 1)
-			end = "EndGame,"+currPlayer.getPlayerNum()+","+"3"+","+currPlayer.getMoney()+","+1+",";
+		{
+			end = "EndGame,"+currPlayer.getPlayerNum()+","+"3"+","+currPlayer.getMoney()+","+"1"+",";
+			String gameState = "GameState,You are now playing your right hand!";
+			sendPackets(gameState.getBytes(),gameBoard.getPlayerByID(Id).address, gameBoard.getPlayerByID(Id).port);
+		}
 		else
 		{
 			if(currPlayer.leftHand.getCardCount() == 0)
-				end = "EndGame,"+currPlayer.getPlayerNum()+","+"3"+","+currPlayer.getMoney()+","+2+",";
+				end = "EndGame,"+currPlayer.getPlayerNum()+","+"3"+","+currPlayer.getMoney()+","+"2"+",";
 			else
-				end = "EndGame,"+currPlayer.getPlayerNum()+","+"3"+","+currPlayer.getMoney()+","+4+",";
+				end = "EndGame,"+currPlayer.getPlayerNum()+","+"3"+","+currPlayer.getMoney()+","+"4"+",";
 		}
 		this.sendPackets(end.getBytes(), currPlayer.address, currPlayer.port);
 	}
@@ -425,7 +448,7 @@ public class Server implements Runnable
 		gameBoard.dealPlayerCard(Id, 1);
 		gameBoard.dealPlayerCard(Id, 2);
 		String showSplit = "Split,"+Id+","+currPlayer.getCurrBet()+","+currPlayer.showHand(1).get(0)+","+currPlayer.showHand(1).get(1)+","
-							+currPlayer.showHand(2).get(0)+","+currPlayer.showHand(1).get(0)+",";
+							+currPlayer.showHand(2).get(0)+","+currPlayer.showHand(2).get(1)+",";
 		sendActionsToEveryonePlaying(showSplit);
 		split = 1;
 	}
@@ -438,15 +461,14 @@ public class Server implements Runnable
 		int Id = Integer.parseInt(arguments[1]);
 		Player currPlayer = gameBoard.getPlayerByID(Id);
 		currPlayer.setCurrBet(2*currPlayer.getCurrBet());
-		gameBoard.dealPlayerCard(Id,0);
+		gameBoard.dealPlayerCard(Id,split);
 		ArrayList<String> cards;
-		String addCards;
-		if(split == 0)
-			addCards = "Hit,"+Id+","+split+",";
-		else if(split == 1)
-			addCards = "Hit,"+Id+","+split+",";
-		else
-			addCards = "Hit,"+Id+","+split+",";
+		String addCards ="Hit,"+Id+","+split+",";
+		if(split == 1)
+		{
+			String gameState = "GameState,You are now playing your right hand!";
+			sendPackets(gameState.getBytes(),gameBoard.getPlayerByID(Id).address, gameBoard.getPlayerByID(Id).port);
+		}
 		cards = gameBoard.getPlayerByID(Id).showHand(split);
 		for(int i =0; i < cards.size(); i++)
 		{
@@ -458,19 +480,18 @@ public class Server implements Runnable
 			gameBoard.setPlayerWonOrLoss(currPlayer, 0,split);
 			String gameEnd;
 			if(split == 0)
-				gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+0+",";
+				gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"0"+",";
 			else if(split == 1)
-				gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+1+",";
+				gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"1"+",";
 			else
 			{
 				if(currPlayer.leftHand.getCardCount() == 0)
-					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+2+",";
+					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"2"+",";
 				else
-					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+4+",";
+					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"4"+",";
 			}
 			this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
-			//standTurnWithoutDealer();
-			if(numPlayersReady.contains(gameBoard.getPlayerByID(Id)))
+			if(numPlayersReady.contains(gameBoard.getPlayerByID(Id)) && split == 0)
 				numPlayersReady.remove(gameBoard.getPlayerByID(Id));
 			standTurn();
 		}
@@ -508,6 +529,11 @@ public class Server implements Runnable
 				showDealerCards+=dealerCards.get(i).getImageString()+",";
 			}
 			sendActionsToEveryonePlaying(showDealerCards);
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			if(gameBoard.dealer.getBlackJackScore() > 21)
 			{
 				for(int i = 0; i < this.numPlayersReady.size(); i++)
@@ -569,7 +595,7 @@ public class Server implements Runnable
 								sendPackets(gameEnd.getBytes(), numPlayersReady.get(i).address, numPlayersReady.get(i).port);
 							}
 						}
-						else if(currPlayer.getBlackjackScore(0) < gameBoard.dealer.getBlackJackScore())
+						else if(currPlayer.getBlackjackScore(j) < gameBoard.dealer.getBlackJackScore())
 						{
 							if(j == 1 && currPlayer.rightHand.getCardCount() == 0)
 							{
@@ -616,41 +642,6 @@ public class Server implements Runnable
 			canSplit *= numPlayersReady.get(idxTurn).canPlayerSplit();
 			String clientAction = "Stand,"+newPlayersTurn+","+canDoubleDown+","+canSplit+",";
 			sendActionsToEveryonePlaying(clientAction);
-		}
-	}
-	/**
-	 * stands the turn if a dealer is not needed because the last player in the game loop busted or already has won/lost the round
-	 */
-	private void standTurnWithoutDealer() 
-	{
-		if(split == 1)
-		{
-			split++;
-			return;
-		}
-		else if(split == 2)
-		{
-			split = 0;
-		}
-		idxTurn++;
-		if(idxTurn >= numPlayersReady.size())
-		{
-			//does dealer do anything?
-			return;
-		}
-		else
-		{
-			int canDoubleDown = 0;
-			int canSplit = 0;
-			int newPlayersTurn = numPlayersReady.get(idxTurn).getPlayerNum();
-			if(numPlayersReady.get(idxTurn).getCurrBet()*2 <= numPlayersReady.get(idxTurn).getMoney())
-			{
-				canDoubleDown = 1;
-				canSplit = 1;
-			}
-			canSplit *= numPlayersReady.get(idxTurn).canPlayerSplit();
-			String clientAction = "Stand,"+newPlayersTurn+","+canDoubleDown+","+canSplit+",";
-			sendActionsToEveryone(clientAction);
 		}
 	}
 	/**

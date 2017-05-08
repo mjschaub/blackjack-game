@@ -54,7 +54,7 @@ public class Dealer
 		}
 	}
 	/**
-	 * gets the blacjack score of the dealer
+	 * gets the blackjack score of the dealer
 	 * @return the integer value
 	 */
 	public int getBlackJackScore()

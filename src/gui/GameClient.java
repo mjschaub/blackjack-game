@@ -169,6 +169,7 @@ public class GameClient extends JFrame implements Runnable
 	private JLabel lblPlayer4rightsplitone;
 	private JLabel lblPlayer4rightsplittwo;
 	private JLabel lblPlayer4rightsplitthree;
+	private int exitAfterTurn;
 	
 	
 	
@@ -244,6 +245,7 @@ public class GameClient extends JFrame implements Runnable
 			playerID = Integer.parseInt(arguments[1]);
 			String money = arguments[2];
 			String bet = arguments[3];
+			this.exitAfterTurn = 0;
 			lblMoney.setText("Money: $"+money);
 			lblBet.setText("Current Bet: $"+bet);
 		}
@@ -294,6 +296,7 @@ public class GameClient extends JFrame implements Runnable
 	{
 		double bet = Double.parseDouble(arguments[1]);
 		lblBet.setText("Current Bet: $"+bet);
+		this.exitAfterTurn = 0;
 		this.btnReadyToPlay.setVisible(true);
 		btnHit.setVisible(false);
 		btnStand.setVisible(false);
@@ -360,6 +363,7 @@ public class GameClient extends JFrame implements Runnable
 	private void dealerTurn(String[] arguments) 
 	{
 		lblDealercardtwo.setVisible(false);
+		this.exitAfterTurn = 1;
 		btnHit.setVisible(false);
 		btnStand.setVisible(false);
 		btnDoubleDown.setVisible(false);
@@ -662,7 +666,10 @@ public class GameClient extends JFrame implements Runnable
 			sendAction(playAgain);	//play another game
 		}
 		else
+		{
+			this.exitAfterTurn = 1;
 			this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)); // quit
+		}
 	}
 	/**
 	 * Starts up a fresh game with the cards that were dealt
@@ -1746,7 +1753,7 @@ public class GameClient extends JFrame implements Runnable
 			public void windowClosing(WindowEvent event)
 			{
 				System.out.println("Player has left the game");
-				String action = "Disconnect,"+playerID+",";
+				String action = "Disconnect,"+playerID+","+exitAfterTurn+",";
 				sendAction(action);
 				myClient.closeConnection();
 				isRunning = false;

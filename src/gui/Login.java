@@ -99,6 +99,8 @@ public class Login extends JFrame
 				String name = nameText.getText();
 				double money = Double.parseDouble(moneyText.getText());
 				double bet = Double.parseDouble(betText.getText());
+				if(bet > money)
+					return;
 				addClient(name,money,bet);
 			}
 		});
