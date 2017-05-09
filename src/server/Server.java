@@ -1,8 +1,6 @@
 package server;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -192,7 +190,7 @@ public class Server implements Runnable
 			Player currPlayer = gameBoard.getPlayerByID(idOfPlayerLeaving);
 			if(numPlayersReady.contains(gameBoard.getPlayerByID(idOfPlayerLeaving)))
 			{
-				if(exitAfterTurn == 0 && numPlayersReady.get(idxTurn) == currPlayer)
+				if(exitAfterTurn == 0 && gameBoard.getPlayerByID(idOfPlayerLeaving) == currPlayer)
 				{
 					standTurn();
 					split = 0;
@@ -355,6 +353,7 @@ public class Server implements Runnable
 		sendActionsToEveryonePlaying(addCards);
 		if(currPlayer.getBlackjackScore(split) > 21)
 		{
+			
 			gameBoard.setPlayerWonOrLoss(currPlayer, 0,split);
 			String gameEnd;
 			if(split == 0)
@@ -373,9 +372,10 @@ public class Server implements Runnable
 					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"4"+",";
 			}
 			this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
+			standTurn();
 			if(numPlayersReady.contains(gameBoard.getPlayerByID(Id)) && split == 0)
 				numPlayersReady.remove(gameBoard.getPlayerByID(Id));
-			standTurn();
+			
 		}
 	}
 	/**
@@ -412,9 +412,10 @@ public class Server implements Runnable
 		Player currPlayer = gameBoard.getPlayerByID(Id);
 		currPlayer.setCurrBet(.5*currPlayer.getCurrBet());
 		gameBoard.setPlayerWonOrLoss(currPlayer, 0,split);
+		standTurn();
 		if(numPlayersReady.contains(gameBoard.getPlayerByID(Id)))
 			numPlayersReady.remove(gameBoard.getPlayerByID(Id));
-		standTurn();
+		
 		String end;
 		if(split == 0)
 			end = "EndGame,"+currPlayer.getPlayerNum()+","+"3"+","+currPlayer.getMoney()+","+"0"+",";
@@ -477,6 +478,7 @@ public class Server implements Runnable
 		sendActionsToEveryonePlaying(addCards);
 		if(currPlayer.getBlackjackScore(split) > 21)
 		{
+			
 			gameBoard.setPlayerWonOrLoss(currPlayer, 0,split);
 			String gameEnd;
 			if(split == 0)
@@ -491,9 +493,10 @@ public class Server implements Runnable
 					gameEnd = "EndGame,"+currPlayer.getPlayerNum()+","+"0"+","+currPlayer.getMoney()+","+"4"+",";
 			}
 			this.sendPackets(gameEnd.getBytes(), currPlayer.address, currPlayer.port);
+			standTurn();
 			if(numPlayersReady.contains(gameBoard.getPlayerByID(Id)) && split == 0)
 				numPlayersReady.remove(gameBoard.getPlayerByID(Id));
-			standTurn();
+			
 		}
 		else
 			standTurn();
@@ -513,7 +516,7 @@ public class Server implements Runnable
 			split = 0;
 		}
 		idxTurn++;
-		if(idxTurn >= numPlayersReady.size())
+		if((idxTurn >= numPlayersReady.size()))
 		{
 			//dealer goes after everyone
 			boolean dealerWentOver = false;

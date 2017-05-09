@@ -1,6 +1,5 @@
 package players;
 
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
@@ -214,7 +213,6 @@ public class Player
 			else if(rightWon == 0)
 				this.money-=currBet/2;
 			this.rightWon = 0;
-			currBet = 0;
 		}	
 	}
 	/**
